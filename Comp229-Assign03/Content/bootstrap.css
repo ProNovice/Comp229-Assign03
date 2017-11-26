@@ -1405,16 +1405,11 @@ pre code {
 }
 
 table {
-  max-width: 100%;
-  background-color: transparent;
+  max-width: red > thead > tr > td {
+  border-bottom-width: 2px;
 }
 
-th {
-  text-align: left;
-}
-
-.table {
-  width: 100%;
+.table-striped > tbody > tr:nth-child() dd) 0%;
   margin-bottom: 20px;
 }
 
@@ -4242,6 +4237,7 @@ textarea.input-group-sm > .input-group-btn > .btn {
   margin: 7.5px -15px;
 }
 
+.navbar-na
 .navbar-nav > li > a {
   padding-top: 10px;
   padding-bottom: 10px;

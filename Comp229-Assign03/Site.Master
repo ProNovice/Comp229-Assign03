@@ -6,14 +6,16 @@
 <head runat="server">
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%: Page.Title %> - My ASP.NET Application</title>
+    <title id="pageTitle" runat="server">My ASP.NET Application</title>
 
     <asp:PlaceHolder runat="server">
         <%: Scripts.Render("~/bundles/modernizr") %>
     </asp:PlaceHolder>
 
-    <webopt:bundlereference runat="server" path="~/Content/css" />
+    <webopt:BundleReference runat="server" Path="~/Content/css" />
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <link href="Content/main.css" rel="stylesheet" />
+    <link href="Content/bootstrap.css" rel="stylesheet" />
 
 </head>
 <body>
@@ -39,34 +41,72 @@
             </Scripts>
         </asp:ScriptManager>
 
-        <div class="navbar navbar-inverse navbar-fixed-top">
-            <div class="container">
+        <div class="navbar">
+            <div class="container" style="max-width: 1080px">
                 <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" runat="server" href="~/">Application name</a>
+                    <a class="nav-top-font" runat="server" href="~/Home.aspx">
+                        <ul class="nav navbar-nav">
+                            <li>
+                                <img src="Assets/logo.png" class="school_logo" /></li>
+                            <li class="nav-top-font margin-top-10px">Lawrence
+                                <br />
+                                College</li>
+                        </ul>
+                    </a>
                 </div>
-                <div class="navbar-collapse collapse">
-                    <ul class="nav navbar-nav">
-                        <li><a runat="server" href="~/">Home</a></li>
-                        <li><a runat="server" href="~/About">About</a></li>
-                        <li><a runat="server" href="~/Contact">Contact</a></li>
+                <div class="padding-top-30px" style="float: right">
+                    <ul class="nav navbar-nav nav-top-font">
+                        <li><a runat="server" href="~/Home.aspx">Home</a></li>
+                        <li>|</li>
+                        <li><a runat="server" href="~/Student.aspx">Student</a></li>
+                        <li>|</li>
+                        <li><a runat="server" href="~/Course.aspx">Course</a></li>
+                        <li>|</li>
+                        <li><a runat="server" href="~/Update.aspx">Update</a></li>
                     </ul>
                 </div>
             </div>
         </div>
-        <div class="container body-content">
-            <asp:ContentPlaceHolder ID="MainContent" runat="server">
-            </asp:ContentPlaceHolder>
-            <hr />
-            <footer>
-                <p>&copy; <%: DateTime.Now.Year %> - My ASP.NET Application</p>
-            </footer>
+        <div class="background-black height-30px"></div>
+        <div class="background-grey">
+            <div class="container body-content background-white box-shadow-10">
+                <hr />
+                <div class="min-height-500">
+                    <asp:ContentPlaceHolder ID="MainContent" runat="server">
+                    </asp:ContentPlaceHolder>
+                </div>
+                <hr />
+            </div>
         </div>
-
+        <footer>
+            <div class="nav navbar-inverse row padding-50px">
+                <div class="container">
+                    <div class="col-sm-2 nav-bottom-header">
+                        <h4>Sitemap</h4>
+                    </div>
+                    <div class="col-sm-3">
+                        <ul style="list-style: none;">
+                            <li><a class="nav-bottom-li" href="Home.aspx">Home</a></li>
+                            <li><a class="nav-bottom-li">About Lawrence</a></li>
+                            <li><a class="nav-bottom-li">Programs</a></li>
+                            <li><a class="nav-bottom-li">Student Life</a></li>
+                            <li><a class="nav-bottom-li">Alumni</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-sm-3">
+                        <ul style="list-style: none;">
+                            <li><a class="nav-bottom-li">Library</a></li>
+                            <li><a class="nav-bottom-li">Faculties</a></li>
+                            <li><a class="nav-bottom-li">News & Events</a></li>
+                            <li><a class="nav-bottom-li">Contact Us</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="background-black copyright height-30px">
+                © Copyright Minseok Choi - COMP229 - Web Application - Fall 2017
+            </div>
+        </footer>
     </form>
 </body>
 </html>
