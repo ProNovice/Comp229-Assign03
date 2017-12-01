@@ -31,22 +31,13 @@ namespace Comp229_Assign03 {
         protected global::System.Web.UI.WebControls.Label studentNamelbl;
         
         /// <summary>
-        /// studentUpdateBtn control.
+        /// studentAddBtn control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button studentUpdateBtn;
-        
-        /// <summary>
-        /// studentDeleteBtn control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button studentDeleteBtn;
+        protected global::System.Web.UI.WebControls.Button studentAddBtn;
         
         /// <summary>
         /// studentCoursesRepeater control.

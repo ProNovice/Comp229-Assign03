@@ -17,29 +17,34 @@
                     </strong></h4>
                 </div>
                 <div style="float: right">
-                    <asp:Button ID="studentUpdateBtn" runat="server" Text="Update" OnClick="updateButton_click" />
-                    |                  
-            <asp:Button ID="studentDeleteBtn" runat="server" Text="Delete" OnClick="deleteButton_click" />
+                    <asp:Button ID="studentAddBtn" runat="server" Text="Update" OnClick="updateButton_click" />
                 </div>
             </div>
-            <!-- Only ItemTemplate can do data binding and < %# Eval("") %>. They don't work in HeaderTemplate and FooterTemplaye -->
-            <!-- https://stackoverflow.com/questions/1470472/net-repeater-headertemplate -->
             <asp:Repeater ID="studentCoursesRepeater" runat="server" OnItemCommand="studentCoursesRepeater_ItemCommand">
                 <HeaderTemplate>
                     <table class="table table-striped courseTable align-center">
                         <thead>
                             <tr>
+                                <th class="col-md-2">Course ID</th>
                                 <th class="col-md-4">Title</th>
                                 <th class="col-md-2">Credits</th>
+                                <th class="col-md-2">Grade</th>
+                                <th class="col-md-2"></th>
                             </tr>
                         </thead>
                         <tbody>
                 </HeaderTemplate>
                 <ItemTemplate>
-                    <tr>
+                    <tr class="text-center">
                         <td>
-                            <asp:LinkButton runat="server" CommandName="linkCourse" CssClass="commonText" CommandArgument='<%# Eval("CourseID") %>'><%# Eval("Title") %></asp:LinkButton></td>
+                            <asp:LinkButton runat="server" CommandName="linkCourse" CssClass="commonText"
+                                CommandArgument='<%# Eval("CourseID") %>'><%# Eval("CourseID") %></asp:LinkButton></td>
+                        <td class="text-left">
+                            <asp:LinkButton runat="server" CommandName="linkCourse" CssClass="commonText"
+                                CommandArgument='<%# Eval("CourseID") %>'><%# Eval("Title") %></asp:LinkButton></td>
                         <td><%# Eval("Credits") %></td>
+                        <td><%# Eval("Grade") %></td>
+                        <td><asp:Button runat="server" CommandName="DeleteCourse" CommandArgument="<%# Eval("CourseID") %>" CssClass="btn" Text="Delete" /></td>
                     </tr>
                 </ItemTemplate>
                 <FooterTemplate>

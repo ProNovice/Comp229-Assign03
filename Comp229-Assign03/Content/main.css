@@ -122,7 +122,7 @@
     }
 
 .courseTable {
-    width: 60%;
+    width:100%;
     align-content: center;
 }
 
@@ -133,4 +133,8 @@
 
 .min-height-500 {
     min-height: 500px;
+}
+
+.text-left {
+    text-align:left;
 }

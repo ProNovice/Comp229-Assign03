@@ -11,7 +11,7 @@ namespace Comp229_Assign03
 {
     public partial class Student : System.Web.UI.Page
     {
-        
+
         //  4.	Your Student Page will:
         //      a.	collect and display personal data about the selected student as covered 
         //          by the SQL database’s Student table. 
@@ -20,8 +20,8 @@ namespace Comp229_Assign03
         //      c.	include an Update link to the Update Page. 
         //      d.	include parameterized SQL queries for all actions. 
         //      e.	include a delete button to remove the selected student (and redirect to the home page). 
-        
-         
+
+
         // Creating a connection from server string
         private SqlConnection connection = new SqlConnection("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=Comp229Assign03;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
 
@@ -35,6 +35,9 @@ namespace Comp229_Assign03
                 studentNamelbl.Text = Session["StudentName"].ToString();
             }
         }
+
+
+
 
         //p.400 in Textbook
         private void GetStudentNames()
@@ -83,6 +86,7 @@ namespace Comp229_Assign03
                     conn.Close();
                 }
         }
+
 
         protected void StudentNamesList_Change(object sender, EventArgs e)
         {
@@ -136,6 +140,7 @@ namespace Comp229_Assign03
                 Response.Redirect("Home.aspx");
             }
         }
+
         #endregion
     }
 }
