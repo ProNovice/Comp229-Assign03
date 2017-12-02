@@ -17,7 +17,8 @@
                     </strong></h4>
                 </div>
                 <div style="float: right">
-                    <asp:Button ID="studentAddBtn" runat="server" Text="Update" OnClick="updateButton_click" />
+                    <asp:Button CssClass="btn" ID="studentAddBtn" runat="server" Text="Update" OnClick="updateButton_click" />|
+                    <asp:Button CssClass="btn" ID="studentDeleteBtn" runat="server" Text="Delete" OnClick="deleteButton_click" />
                 </div>
             </div>
             <asp:Repeater ID="studentCoursesRepeater" runat="server" OnItemCommand="studentCoursesRepeater_ItemCommand">
