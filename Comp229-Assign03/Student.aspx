@@ -44,7 +44,7 @@
                                 CommandArgument='<%# Eval("CourseID") %>'><%# Eval("Title") %></asp:LinkButton></td>
                         <td><%# Eval("Credits") %></td>
                         <td><%# Eval("Grade") %></td>
-                        <td><asp:Button runat="server" CommandName="DeleteCourse" CommandArgument="<%# Eval("CourseID") %>" CssClass="btn" Text="Delete" /></td>
+                        <td><asp:Button runat="server" CommandName="DeleteCourse" CommandArgument='<%# Eval("CourseID") %>' CssClass="btn" Text="Delete" /></td>
                     </tr>
                 </ItemTemplate>
                 <FooterTemplate>

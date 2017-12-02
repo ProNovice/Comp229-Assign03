@@ -13,33 +13,6 @@ namespace Comp229_Assign03 {
     public partial class Home {
         
         /// <summary>
-        /// studentNamelbl control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label studentNamelbl;
-        
-        /// <summary>
-        /// studentUpdateBtn control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button studentUpdateBtn;
-        
-        /// <summary>
-        /// studentDeleteBtn control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button studentDeleteBtn;
-        
-        /// <summary>
         /// studentsRepeater control.
         /// </summary>
         /// <remarks>
@@ -49,31 +22,22 @@ namespace Comp229_Assign03 {
         protected global::System.Web.UI.WebControls.Repeater studentsRepeater;
         
         /// <summary>
-        /// txtStudentID control.
+        /// txtFirstName control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtStudentID;
+        protected global::System.Web.UI.WebControls.TextBox txtFirstName;
         
         /// <summary>
-        /// txtStudentName control.
+        /// txtLastName control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtStudentName;
-        
-        /// <summary>
-        /// txtEnrollmentDate control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtEnrollmentDate;
+        protected global::System.Web.UI.WebControls.TextBox txtLastName;
         
         /// <summary>
         /// AddStudent control.

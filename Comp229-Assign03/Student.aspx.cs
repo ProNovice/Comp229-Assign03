@@ -36,9 +36,6 @@ namespace Comp229_Assign03
             }
         }
 
-
-
-
         //p.400 in Textbook
         private void GetStudentNames()
         {
@@ -57,8 +54,36 @@ namespace Comp229_Assign03
                 conn.Close();
             }
 
-            Session["StudentID"] = studentNameList.SelectedValue;
-            Session["StudentName"] = studentNameList.SelectedItem.Text;
+            string studentID = Session["StudentID"].ToString();
+
+            // if there is no value in session studentID
+            if (studentID == null)
+            {
+                Session["StudentID"] = studentNameList.SelectedValue;
+                Session["StudentName"] = studentNameList.SelectedItem.Text;
+            }
+            // if there is any value in session studentID
+            else
+            {
+                bool found = false;
+                for (int i = 0; i < studentNameList.Items.Count; i++)
+                {
+                    studentNameList.SelectedIndex = i;
+                    if (studentID == studentNameList.SelectedValue)
+                    {
+                        found = true;
+                        Session["StudentName"] = studentNameList.SelectedItem.Text;
+                        break;
+                    }
+                }
+                // if the session studentID value does not match any value in StudentNameList, set index 0
+                if (!found)
+                {
+                    studentNameList.SelectedIndex = 0;
+                    Session["StudentID"] = studentNameList.SelectedValue;
+                    Session["StudentName"] = studentNameList.SelectedItem.Text;
+                }
+            }
         }
 
         private void GetStudentCourses()
