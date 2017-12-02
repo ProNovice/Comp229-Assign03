@@ -91,51 +91,28 @@ namespace Comp229_Assign03
             // redirect to Course page
             if (e.CommandName == "linkCourse")
             {
-                Session["Course"] = e.CommandArgument.ToString();
+                Session["CourseID"] = e.CommandArgument.ToString();
                 Response.Redirect("Course.aspx");
             }
+            else if (e.CommandName == "updateCourse")
+            { }
+            else if (e.CommandName == "deleteCourse")
+            {
+                int enrollmentID = Convert.ToInt32(e.CommandArgument.ToString());
+                int studentID = Convert.ToInt32(Session["StudentID"]);  // if the page was loaded well, it means there is a value in Session["StudentID"]
 
 
-            //protected void myRepeater_ItemCommand(object source, RepeaterCommandEventArgs e)
-            //{
-            //    // try-finally to ensure that the connection is closed if there's an issue
-            //    try
-            //    {
-            //        if (e.CommandName == "deleteCommand")
-            //        {
-            //            // You can't delete a record with references in other tables, so delete those references first
-            //            SqlCommand deleteEnrollments = new SqlCommand("DELETE FROM Enrollments WHERE CourseID=@CourseID", connection);
-            //            SqlCommand deleteCourse = new SqlCommand("DELETE FROM Courses WHERE CourseID=@CourseID", connection);
+                // delete enrollments first, then delete the student
+                SqlCommand deleteEnrollment = new SqlCommand("DELETE FROM Enrollments WHERE StudentID=@StudentID", connection);
 
-            //            // Parameterize everything, even if the user isn't entering the values
-            //            deleteEnrollments.Parameters.AddWithValue("@CourseID", e.CommandArgument);
-            //            deleteCourse.Parameters.AddWithValue("@CourseID", e.CommandArgument);
 
-            //            connection.Open(); // open the cmd connection
+                connection.Close();
 
-            //            // delete the references FIRST
-            //            deleteEnrollments.ExecuteNonQuery();
-            //            deleteCourse.ExecuteNonQuery();
-            //        }
-            //        else if (e.CommandName == "updateCommand")
-            //        {
-            //            SqlCommand cmd = new SqlCommand("UPDATE Courses SET Title=@UpdatedTitle WHERE Title=@Title", connection);
-            //            cmd.Parameters.AddWithValue("@Title", e.CommandArgument);
-            //            cmd.Parameters.AddWithValue("@UpdatedTitle", e.CommandArgument + " - Updated");
+                // redirect to Home page
+                Response.Redirect("Home.aspx");
 
-            //            connection.Open(); // open the cmd connection
 
-            //            cmd.ExecuteNonQuery();
-            //        }
-            //    }
-            //    finally
-            //    {
-            //        connection.Close();
-            //    }
-
-            //    // Re-bind the data with the changed database records
-            //    GetClasses();
-            //}
+            }
         }
 
 
