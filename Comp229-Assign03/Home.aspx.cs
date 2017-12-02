@@ -9,7 +9,7 @@ using System.Web.UI.WebControls;
 
 namespace Comp229_Assign03
 {
-    public partial class Home : System.Web.UI.Page
+    public partial class Home : Page
     {
         // This Home page is integrated with Course Page.
         // Because the displayed contents are same.
@@ -35,7 +35,7 @@ namespace Comp229_Assign03
             {
                 GetCourseList();
                 GetStudents();
-                RefreshCourseInfo();
+                GetCourseInfo();
             }
         }
 
@@ -56,9 +56,6 @@ namespace Comp229_Assign03
 
                 // also put 'All' item to show all students registered
                 ListItem itemForAll = new ListItem("All", "-1");
-                // if there is no selected CourseID, this item is selected
-                if (Session["CourseID"] == null)
-                    itemForAll.Selected = true;
                 // add the item for 'all'
                 courseList.Items.Add(itemForAll);
                 // close reader
@@ -71,8 +68,9 @@ namespace Comp229_Assign03
             // if there is no value in session CourseID or the value is -1
             if (Session["CourseID"] == null || Convert.ToInt32(Session["CourseID"]) == -1)
             {
-                Session["CourseID"] = courseList.SelectedValue;
+                Session["CourseID"] = -1;
                 Session["Title"] = courseList.SelectedItem.Text;
+                courseList.SelectedIndex = courseList.Items.Count - 1;
             }
             // if there is any value in session CourseID
             else
@@ -101,10 +99,10 @@ namespace Comp229_Assign03
 
         protected void CourseList_Change(object sender, EventArgs e)
         {
-            RefreshCourseInfo();
+            GetCourseInfo();
         }
 
-        private void RefreshCourseInfo()
+        private void GetCourseInfo()
         {
             string courseID = courseList.SelectedValue;
             string courseTitle = courseList.SelectedItem.Text;
@@ -115,7 +113,8 @@ namespace Comp229_Assign03
             string credits = "";
             string departmentID = "";
 
-            if (Convert.ToInt32(courseID) > 300000)
+            // prevent exception of 'All'
+            if (Convert.ToInt32(courseID) > 4000)
                 using (SqlConnection conn = new SqlConnection(WebConfigurationManager.ConnectionStrings["StudentDB"].ConnectionString))
                 {
                     conn.Open();
@@ -125,12 +124,12 @@ namespace Comp229_Assign03
                     SqlCommand getCredits = new SqlCommand(
                          "SELECT Credits FROM Courses WHERE CourseID = @CourseID;", conn);
                     getCredits.Parameters.AddWithValue("@CourseID", courseID);
-                    credits = getCredits.ExecuteScalar().ToString();
+                    credits = "Credits: " + getCredits.ExecuteScalar().ToString();
 
                     SqlCommand getDepartmentID = new SqlCommand(
                          "SELECT DepartmentID FROM Courses WHERE CourseID = @CourseID;", conn);
                     getDepartmentID.Parameters.AddWithValue("@CourseID", courseID);
-                    departmentID = getDepartmentID.ExecuteScalar().ToString();
+                    departmentID = "Department ID: " + getDepartmentID.ExecuteScalar().ToString();
 
                     conn.Close();
                 }
@@ -229,7 +228,7 @@ namespace Comp229_Assign03
 
             string firstName = txtFirstName.Text;
             string lastName = txtLastName.Text;
-            DateTime enrollmentDate = DateTime.Today;
+            string enrollmentDate = inputDate.Value;
 
             SqlCommand insertStudent;
 

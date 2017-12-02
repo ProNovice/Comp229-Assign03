@@ -2,26 +2,42 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
     <div class="container">
-        <asp:Label runat="server" Text="Please select a student to see their courses.&nbsp;" />
+        <h2><strong>Student Information</strong></h2>
         <p>
             <label>Student:&nbsp; </label>
             <!--AutoPostBack has to be "true" -->
             <asp:DropDownList ID="studentNameList" runat="server" AutoPostBack="true" OnSelectedIndexChanged="StudentNamesList_Change">
             </asp:DropDownList>
         </p>
+        <asp:Label runat="server" Text="Please select a student to see their courses.&nbsp;" />
         <div class="col-md-8" style="margin-right: auto; margin-left: 25%">
-            <div class="row">
-                <div class="col-md-6">
-                    <h4><strong>
-                        <asp:Label runat="server" ID="studentNamelbl" Text="Name" />
-                    </strong></h4>
+            <div class="container table-bordered">
+                <h3><strong>
+                    <asp:Label runat="server" ID="lblStudentName" Text="Student" />
+                </strong></h3>
+                <div class="row">
+                    <div class="col-md-4">
+                        <h4><strong>
+                            <asp:Label runat="server" ID="lblStudentID" Text="StudentID" />
+                        </strong></h4>
+                    </div>
+                    <div class="col-md-6">
+                        <h4><strong>
+                            <asp:Label runat="server" Text="Enrollment Date: " />
+                            <asp:Label runat="server" ID="lblEnrollmentDate" Text="EnrollmentDate" />
+                        </strong></h4>
+                    </div>
                 </div>
+                <p>To see information of a course, please click the course name in the list.</p>
+                To edit the student information, please click the Update button.
                 <div style="float: right">
-                    <asp:Button CssClass="btn" ID="studentAddBtn" runat="server" Text="Update" OnClick="updateButton_click" />|
-                    <asp:Button CssClass="btn" ID="studentDeleteBtn" runat="server" Text="Delete" OnClick="deleteButton_click" />
+                    <asp:Button CssClass="btn" ID="studentAddBtn" runat="server" Text="Go to Update" OnClick="UpdateButton_click" />|
+                    <asp:Button CssClass="btn" ID="studentDeleteBtn" runat="server" Text="Delete" OnClick="DeleteButton_click" />
                 </div>
+                <br />
+                <br />
             </div>
-            <asp:Repeater ID="studentCoursesRepeater" runat="server" OnItemCommand="studentCoursesRepeater_ItemCommand">
+            <asp:Repeater ID="studentCoursesRepeater" runat="server" OnItemCommand="StudentCoursesRepeater_ItemCommand">
                 <HeaderTemplate>
                     <table class="table table-striped courseTable align-center">
                         <thead>
@@ -30,7 +46,6 @@
                                 <th class="col-md-4">Title</th>
                                 <th class="col-md-2">Credits</th>
                                 <th class="col-md-2">Grade</th>
-                                <th class="col-md-2"></th>
                             </tr>
                         </thead>
                         <tbody>

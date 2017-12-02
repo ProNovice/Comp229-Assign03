@@ -9,7 +9,7 @@ using System.Web.Configuration;
 
 namespace Comp229_Assign03
 {
-    public partial class Student : System.Web.UI.Page
+    public partial class Student : Page
     {
 
         //  4.	Your Student Page will:
@@ -23,7 +23,7 @@ namespace Comp229_Assign03
 
 
         // Creating a connection from server string
-        private SqlConnection connection = new SqlConnection("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=Comp229Assign03;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
+        private SqlConnection conn = new SqlConnection("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=Comp229Assign03;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -32,7 +32,7 @@ namespace Comp229_Assign03
             {
                 GetStudentNameList();
                 GetStudentCourses();
-                studentNamelbl.Text = Session["StudentName"].ToString();
+                GetStudentInfo();
             }
         }
 
@@ -86,11 +86,11 @@ namespace Comp229_Assign03
 
         private void GetStudentCourses()
         {
-            int studentID = Convert.ToInt32(Session["StudentID"]);
-
-            if (studentID >= 300000)
+            if (Session["StudentID"] != null)
                 using (SqlConnection conn = new SqlConnection(WebConfigurationManager.ConnectionStrings["StudentDB"].ConnectionString))
                 {
+                    int studentID = Convert.ToInt32(Session["StudentID"]);
+
                     //JOIN tableName USING (columnName) does not work here.
                     //tableName cannnot be replaced by another word. 
                     //  Bad example: SELECT name FROM Student S JOIN Enrollments E ON S.StudentID = E.StudentID;
@@ -110,16 +110,40 @@ namespace Comp229_Assign03
                 }
         }
 
-
-        protected void StudentNamesList_Change(object sender, EventArgs e)
+        private void GetStudentInfo()
         {
             Session["StudentID"] = Convert.ToInt32(studentNameList.SelectedValue);
             Session["StudentName"] = studentNameList.SelectedItem.Text;
-            studentNamelbl.Text = Session["StudentName"].ToString();
+            lblStudentName.Text = Session["StudentName"].ToString();
+            lblStudentID.Text = "Student ID: " + Session["StudentID"];
+            string studentID = Session["StudentID"].ToString();
+            string enrollmentDate = "";
+
+            // find EnrollmentDate
+            using (SqlConnection conn = new SqlConnection(WebConfigurationManager.ConnectionStrings["StudentDB"].ConnectionString))
+            {
+                conn.Open();
+
+                // find enrollment date of student
+                // source: https://stackoverflow.com/questions/1555320/store-value-in-a-variable-after-using-select-statement
+                SqlCommand getEnrollmentDate = new SqlCommand(
+                     "SELECT CONVERT(VARCHAR(10), EnrollmentDate, 101) AS EnrollmentDate FROM Students WHERE StudentID = @StudentID;", conn);
+                getEnrollmentDate.Parameters.AddWithValue("@StudentID", studentID);
+                enrollmentDate = getEnrollmentDate.ExecuteScalar().ToString();
+
+                conn.Close();
+            }
+            lblEnrollmentDate.Text = enrollmentDate;
+        }
+
+
+        protected void StudentNamesList_Change(object sender, EventArgs e)
+        {
+            GetStudentInfo();
             GetStudentCourses();
         }
 
-        protected void studentCoursesRepeater_ItemCommand(object source, RepeaterCommandEventArgs e)
+        protected void StudentCoursesRepeater_ItemCommand(object source, RepeaterCommandEventArgs e)
         {
             // redirect to Course page
             if (e.CommandName == "linkCourse")
@@ -133,31 +157,28 @@ namespace Comp229_Assign03
         #region Buttons
 
         // Those actions cannot use ItemCommand in Repeater if th
-        protected void updateButton_click(object sender, EventArgs e)
+        protected void UpdateButton_click(object sender, EventArgs e)
         {
             Session["StudentID"] = Convert.ToInt32(studentNameList.SelectedValue);
             Session["StudentName"] = studentNameList.SelectedItem.Text;
             Response.Redirect("Update.aspx");
         }
 
-        protected void deleteButton_click(object sender, EventArgs e)
+        protected void DeleteButton_click(object sender, EventArgs e)
         {
-            // to prevent exception
             if (Session["StudentID"] != null)
             {
                 // delete enrollments first, then delete the student
-                SqlCommand deleteEnrollment = new SqlCommand("DELETE FROM Enrollments WHERE StudentID=@StudentID", connection);
-                SqlCommand deleteStudent = new SqlCommand("DELETE FROM Students WHERE StudentID=@StudentID", connection);
-
+                SqlCommand deleteEnrollment = new SqlCommand("DELETE FROM Enrollments WHERE StudentID=@StudentID", conn);
+                SqlCommand deleteStudent = new SqlCommand("DELETE FROM Students WHERE StudentID=@StudentID", conn);
                 deleteEnrollment.Parameters.AddWithValue("@StudentID", Session["StudentID"]);
                 deleteStudent.Parameters.AddWithValue("@StudentID", Session["StudentID"]);
 
-                connection.Open();
-
+                // execute queries
+                conn.Open();
                 deleteEnrollment.ExecuteNonQuery();
                 deleteStudent.ExecuteNonQuery();
-
-                connection.Close();
+                conn.Close();
 
                 // redirect to Home page
                 Response.Redirect("Home.aspx");

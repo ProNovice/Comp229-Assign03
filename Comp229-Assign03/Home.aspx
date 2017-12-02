@@ -2,7 +2,7 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
     <div class="container">
-        <br />
+        <h2><strong>Course Information</strong></h2>
         <p>
             <label>Course:&nbsp; </label>
             <!--AutoPostBack has to be "true" -->
@@ -12,12 +12,10 @@
         <asp:Label runat="server" Text="Please select a student to see their courses.&nbsp;" />
         <div class="col-md-8" style="margin-right: auto; margin-left: 25%">
             <div class="container table-bordered">
+                <h3><strong>
+                    <asp:Label runat="server" ID="courselbl" Text="Course" />
+                </strong></h3>
                 <div class="row">
-                    <div class="col-md-4">
-                        <h4><strong>
-                            <asp:Label runat="server" ID="courselbl" Text="Course" />
-                        </strong></h4>
-                    </div>
                     <div class="col-md-4">
                         <h4><strong>
                             <asp:Label runat="server" ID="creditlbl" Text="Credit" />
@@ -94,6 +92,16 @@
                         <tr>
                             <td colspan="2">
                                 <asp:RequiredFieldValidator ValidationGroup="groupNewStudent" runat="server" ControlToValidate="txtLastName" ErrorMessage="Last name is required" ForeColor="Red"></asp:RequiredFieldValidator></td>
+                        </tr>
+                        <tr>
+                            <td>Enrollment Date: </td>
+                            <td>
+                                <input runat="server" type="date" id="inputDate" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <asp:RequiredFieldValidator ValidationGroup="groupNewStudent" runat="server" ControlToValidate="inputDate" ErrorMessage="Date is required" ForeColor="Red"></asp:RequiredFieldValidator></td>
                         </tr>
                         <tr>
                             <td class="text-center" colspan="2">

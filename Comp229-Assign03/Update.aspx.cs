@@ -6,10 +6,11 @@ using System.Web;
 using System.Web.Configuration;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using System.Text.RegularExpressions;
 
 namespace Comp229_Assign03
 {
-    public partial class Update : System.Web.UI.Page
+    public partial class Update : Page
     {
 
         //  6.	The Update Page will:
@@ -17,21 +18,21 @@ namespace Comp229_Assign03
         //    b.allow for changing any data fields.
         //    c.update changed fields in the database.
 
-        private SqlConnection connection = new SqlConnection("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=Comp229Assign03;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
+        private SqlConnection conn = new SqlConnection("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=Comp229Assign03;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
 
         protected void Page_Load(object sender, EventArgs e)
         {
             // Only work when the page is initialized
             if (!IsPostBack)
             {
-                GetStudentNames();
+                GetStudentNameList();
                 GetStudentCourses();
-                studentNamelbl.Text = Session["StudentName"].ToString();
+                GetStudentInfo();
+                GetNewCourseList();
             }
         }
-
         //p.400 in Textbook
-        private void GetStudentNames()
+        private void GetStudentNameList()
         {
             using (SqlConnection conn = new SqlConnection(WebConfigurationManager.ConnectionStrings["StudentDB"].ConnectionString))
             {
@@ -48,17 +49,43 @@ namespace Comp229_Assign03
                 conn.Close();
             }
 
-            Session["StudentID"] = studentNameList.SelectedValue;
-            Session["StudentName"] = studentNameList.SelectedItem.Text;
+            // if there is no value in session studentID
+            if (Session["StudentID"] == null)
+            {
+                Session["StudentID"] = studentNameList.SelectedValue;
+                Session["StudentName"] = studentNameList.SelectedItem.Text;
+            }
+            // if there is any value in session studentID
+            else
+            {
+                bool found = false;
+                for (int i = 0; i < studentNameList.Items.Count; i++)
+                {
+                    studentNameList.SelectedIndex = i;
+                    if (Session["StudentID"].ToString() == studentNameList.SelectedValue)
+                    {
+                        found = true;
+                        Session["StudentName"] = studentNameList.SelectedItem.Text;
+                        break;
+                    }
+                }
+                // if the session studentID value does not match any value in StudentNameList, set index 0
+                if (!found)
+                {
+                    studentNameList.SelectedIndex = 0;
+                    Session["StudentID"] = studentNameList.SelectedValue;
+                    Session["StudentName"] = studentNameList.SelectedItem.Text;
+                }
+            }
         }
 
         private void GetStudentCourses()
         {
-            int studentID = Convert.ToInt32(Session["StudentID"]);
-
-            if (studentID >= 300000)
+            if (Session["StudentID"] != null)
                 using (SqlConnection conn = new SqlConnection(WebConfigurationManager.ConnectionStrings["StudentDB"].ConnectionString))
                 {
+                    int studentID = Convert.ToInt32(Session["StudentID"]);
+
                     //JOIN tableName USING (columnName) does not work here.
                     //tableName cannnot be replaced by another word. 
                     //  Bad example: SELECT name FROM Student S JOIN Enrollments E ON S.StudentID = E.StudentID;
@@ -78,72 +105,224 @@ namespace Comp229_Assign03
                 }
         }
 
-        protected void StudentNamesList_Change(object sender, EventArgs e)
+        private void GetStudentInfo()
         {
             Session["StudentID"] = Convert.ToInt32(studentNameList.SelectedValue);
             Session["StudentName"] = studentNameList.SelectedItem.Text;
-            studentNamelbl.Text = Session["StudentName"].ToString();
+            lblStudentName.Text = Session["StudentName"].ToString();
+            lblStudentID.Text = "Student ID: " + Session["StudentID"];
+            string studentID = Session["StudentID"].ToString();
+            string enrollmentDate = "4";
+
+            // find EnrollmentDate
+            using (SqlConnection conn = new SqlConnection(WebConfigurationManager.ConnectionStrings["StudentDB"].ConnectionString))
+            {
+                conn.Open();
+
+                // find enrollment date of student
+                // source: https://stackoverflow.com/questions/1555320/store-value-in-a-variable-after-using-select-statement
+                SqlCommand getEnrollmentDate = new SqlCommand(
+                     "SELECT CONVERT(VARCHAR(10), EnrollmentDate, 120) AS EnrollmentDate FROM Students WHERE StudentID = @StudentID;", conn);
+                getEnrollmentDate.Parameters.AddWithValue("@StudentID", studentID);
+                enrollmentDate = getEnrollmentDate.ExecuteScalar().ToString();
+
+                conn.Close();
+            }
+            inputDate.Value = enrollmentDate;
+        }
+
+        protected void StudentNamesList_Change(object sender, EventArgs e)
+        {
+            GetStudentInfo();
             GetStudentCourses();
         }
 
-        protected void studentCoursesRepeater_ItemCommand(object source, RepeaterCommandEventArgs e)
+        protected void StudentCoursesRepeater_ItemCommand(object source, RepeaterCommandEventArgs e)
         {
             // redirect to Course page
             if (e.CommandName == "linkCourse")
             {
                 Session["CourseID"] = e.CommandArgument.ToString();
-                Response.Redirect("Course.aspx");
+                Response.Redirect("Home.aspx");
             }
             else if (e.CommandName == "updateCourse")
-            { }
+            {
+            }
             else if (e.CommandName == "deleteCourse")
             {
                 int enrollmentID = Convert.ToInt32(e.CommandArgument.ToString());
                 int studentID = Convert.ToInt32(Session["StudentID"]);  // if the page was loaded well, it means there is a value in Session["StudentID"]
 
-
                 // delete enrollments first, then delete the student
-                SqlCommand deleteEnrollment = new SqlCommand("DELETE FROM Enrollments WHERE StudentID=@StudentID", connection);
-
-
-                connection.Close();
-
-                // redirect to Home page
-                Response.Redirect("Home.aspx");
-
-
+                SqlCommand deleteEnrollment = new SqlCommand("DELETE FROM Enrollments WHERE EnrollmentID = @EnrollmentID", conn);
+                deleteEnrollment.Parameters.AddWithValue("EnrollmentID", enrollmentID);
+                // execute query
+                conn.Open();
+                deleteEnrollment.ExecuteNonQuery();
+                conn.Close();
+                // refresh
+                GetStudentCourses();
             }
         }
 
+        #region Add new course
 
-        #region Buttons
-
-        // Those actions cannot use ItemCommand in Repeater if th
-        protected void updateButton_click(object sender, EventArgs e)
+        private void GetNewCourseList()
         {
-            Session["StudentID"] = Convert.ToInt32(studentNameList.SelectedValue);
-            Session["StudentName"] = studentNameList.SelectedItem.Text;
-            Response.Redirect("Update.aspx");
+            using (SqlConnection conn = new SqlConnection(WebConfigurationManager.ConnectionStrings["StudentDB"].ConnectionString))
+            {
+                // open connection
+                conn.Open();
+                // Display all Course Titles
+                SqlCommand allStudentNamesComm = new SqlCommand("SELECT * FROM Courses", conn);
+                SqlDataReader reader = allStudentNamesComm.ExecuteReader();
+                newCourseList.DataSource = reader;
+                newCourseList.DataValueField = "CourseID";
+                newCourseList.DataTextField = "Title";
+                newCourseList.DataBind();
+                // close reader
+                reader.Close();
+                // close connection
+                conn.Close();
+            }
+
         }
 
-        protected void deleteButton_click(object sender, EventArgs e)
+        protected void AddCourseButton_click(object sender, EventArgs e)
+        {
+            string courseID = newCourseList.SelectedValue;
+            string studentID = Session["StudentID"].ToString();
+            int grade = Convert.ToInt32(numNewGrade.Value);
+
+            conn.Open();
+            // check if there is same course in the student's enrollments
+            SqlCommand findSameCourse = new SqlCommand(
+                "SELECT CourseID FROM Enrollments WHERE StudentID = @StudentID AND CourseID = @CourseID", conn);
+            findSameCourse.Parameters.AddWithValue("@CourseID", courseID);
+            findSameCourse.Parameters.AddWithValue("@StudentID", studentID);
+            SqlDataReader sameCourseReader = findSameCourse.ExecuteReader();
+
+            string foundCourse = null;
+            if(sameCourseReader.Read())
+                foundCourse = Convert.ToString(sameCourseReader[0]);
+            sameCourseReader.Close();
+
+            if (foundCourse == null)
+            {
+                // insert a new enrollment
+                SqlCommand insertEnrollment = new SqlCommand(
+                    "INSERT INTO Enrollments (CourseID, StudentID, Grade) " +
+                    "VALUES (@CourseID, @StudentID, @Grade);", conn);
+                insertEnrollment.Parameters.AddWithValue("@CourseID", courseID);
+                insertEnrollment.Parameters.AddWithValue("@StudentID", studentID);
+                insertEnrollment.Parameters.AddWithValue("@Grade", grade);  // because Grade value cannot be null in Enrollments table 
+                insertEnrollment.ExecuteNonQuery();
+
+                lblNewCourseError.Visible = false;
+            }
+            else
+            {
+                lblNewCourseError.Visible = true;
+            }
+
+            conn.Close();
+
+            GetStudentCourses();
+        }
+
+        #endregion
+        
+        #region Buttons & OnChanged
+
+
+        protected void Grade_OnChanged(object sender, EventArgs s)
+        {
+            RepeaterItem item = (sender as TextBox).Parent as RepeaterItem;
+            // .Text is always 'Value' in the Tag 
+            string grade = (item.FindControl("txtGrade") as TextBox).Text;
+
+            // identify if string grade consists of only number
+            // source: https://stackoverflow.com/questions/894263/how-do-i-identify-if-a-string-is-a-number
+            int n;
+            bool isNumeric = int.TryParse(grade, out n);
+            // prevent Error because of not pure numeric value
+            if (!isNumeric)
+            {
+                // remove all not number characters
+                Regex rgx = new Regex("[^0-9]");
+                grade = rgx.Replace(grade, "");
+            }
+            (item.FindControl("txtGrade") as TextBox).Text = grade;
+        }
+
+        // Important function
+        // find item in itemTemplate through FindControl
+        protected void UpdateGradeButton_click(object sender, EventArgs e)
+        {
+            string grade;
+            string enrollmentID;
+            // find item's ID by using RepeaterItem, FindControl("original ID in itemTemplate");
+            // source: https://www.aspsnippets.com/Articles/ASPNet-Repeater-CRUD-Select-Insert-Edit-Update-and-Delete-in-Repeater-using-C-and-VBNet.aspx
+            RepeaterItem item = (sender as Button).Parent as RepeaterItem;
+            // .Text is always 'Value' in the Tag 
+            grade = (item.FindControl("txtGrade") as TextBox).Text;
+            enrollmentID = (item.FindControl("lblEnrollmentID") as Label).Text;
+
+            // identify if string grade consists of only number
+            // source: https://stackoverflow.com/questions/894263/how-do-i-identify-if-a-string-is-a-number
+            int n;
+            bool isNumeric = int.TryParse(grade, out n);
+            // prevent Error because of not pure numeric value
+            if (isNumeric)
+            {
+                // execute queries
+                conn.Open();
+                SqlCommand updateGrade = new SqlCommand(
+                    "UPDATE Enrollments SET Grade = @Grade WHERE EnrollmentID = @EnrollmentID;", conn);
+                updateGrade.Parameters.AddWithValue("@Grade", grade);
+                updateGrade.Parameters.AddWithValue("@EnrollmentID", enrollmentID);
+                updateGrade.ExecuteNonQuery();
+                conn.Close();
+                lblStudentName.Text = grade + enrollmentID;
+            }
+
+        }
+
+        // Those actions cannot use ItemCommand in Repeater if th
+        protected void UpdateButton_click(object sender, EventArgs e)
         {
             // to prevent exception
             if (Session["StudentID"] != null)
             {
-                // delete enrollments first, then delete the student
-                SqlCommand deleteEnrollment = new SqlCommand("DELETE FROM Enrollments WHERE StudentID=@StudentID", connection);
-                SqlCommand deleteStudent = new SqlCommand("DELETE FROM Students WHERE StudentID=@StudentID", connection);
+                string studentID = Session["StudentID"].ToString();
+                string enrollmentDate = inputDate.Value;
+                SqlCommand updateStudent = new SqlCommand(
+                    "UPDATE Students SET EnrollmentDate = @EnrollmentDate WHERE StudentID = @StudentID", conn);
+                updateStudent.Parameters.AddWithValue("@EnrollmentDate", enrollmentDate);
+                updateStudent.Parameters.AddWithValue("@StudentID", studentID);
 
+                // execute query
+                conn.Open();
+                updateStudent.ExecuteNonQuery();
+                conn.Close();
+            }
+        }
+
+        protected void DeleteButton_click(object sender, EventArgs e)
+        {
+            if (Session["StudentID"] != null)
+            {
+                // delete enrollments first, then delete the student
+                SqlCommand deleteEnrollment = new SqlCommand("DELETE FROM Enrollments WHERE StudentID=@StudentID", conn);
+                SqlCommand deleteStudent = new SqlCommand("DELETE FROM Students WHERE StudentID=@StudentID", conn);
                 deleteEnrollment.Parameters.AddWithValue("@StudentID", Session["StudentID"]);
                 deleteStudent.Parameters.AddWithValue("@StudentID", Session["StudentID"]);
 
-                connection.Open();
-
+                // execute queries
+                conn.Open();
                 deleteEnrollment.ExecuteNonQuery();
                 deleteStudent.ExecuteNonQuery();
-
-                connection.Close();
+                conn.Close();
 
                 // redirect to Home page
                 Response.Redirect("Home.aspx");

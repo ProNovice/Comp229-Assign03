@@ -22,13 +22,31 @@ namespace Comp229_Assign03 {
         protected global::System.Web.UI.WebControls.DropDownList studentNameList;
         
         /// <summary>
-        /// studentNamelbl control.
+        /// lblStudentName control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label studentNamelbl;
+        protected global::System.Web.UI.WebControls.Label lblStudentName;
+        
+        /// <summary>
+        /// lblStudentID control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblStudentID;
+        
+        /// <summary>
+        /// lblEnrollmentDate control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblEnrollmentDate;
         
         /// <summary>
         /// studentAddBtn control.
