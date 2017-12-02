@@ -13,6 +13,42 @@ namespace Comp229_Assign03 {
     public partial class Home {
         
         /// <summary>
+        /// courseList control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList courseList;
+        
+        /// <summary>
+        /// courselbl control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label courselbl;
+        
+        /// <summary>
+        /// creditlbl control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label creditlbl;
+        
+        /// <summary>
+        /// departmentIDlbl control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label departmentIDlbl;
+        
+        /// <summary>
         /// studentsRepeater control.
         /// </summary>
         /// <remarks>

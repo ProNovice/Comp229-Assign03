@@ -30,14 +30,14 @@ namespace Comp229_Assign03
             // Only work when the page is initialized
             if (!IsPostBack)
             {
-                GetStudentNames();
+                GetStudentNameList();
                 GetStudentCourses();
                 studentNamelbl.Text = Session["StudentName"].ToString();
             }
         }
 
         //p.400 in Textbook
-        private void GetStudentNames()
+        private void GetStudentNameList()
         {
             using (SqlConnection conn = new SqlConnection(WebConfigurationManager.ConnectionStrings["StudentDB"].ConnectionString))
             {
@@ -54,10 +54,8 @@ namespace Comp229_Assign03
                 conn.Close();
             }
 
-            string studentID = Session["StudentID"].ToString();
-
             // if there is no value in session studentID
-            if (studentID == null)
+            if (Session["StudentID"] == null)
             {
                 Session["StudentID"] = studentNameList.SelectedValue;
                 Session["StudentName"] = studentNameList.SelectedItem.Text;
@@ -69,7 +67,7 @@ namespace Comp229_Assign03
                 for (int i = 0; i < studentNameList.Items.Count; i++)
                 {
                     studentNameList.SelectedIndex = i;
-                    if (studentID == studentNameList.SelectedValue)
+                    if (Session["StudentID"].ToString() == studentNameList.SelectedValue)
                     {
                         found = true;
                         Session["StudentName"] = studentNameList.SelectedItem.Text;
@@ -126,8 +124,8 @@ namespace Comp229_Assign03
             // redirect to Course page
             if (e.CommandName == "linkCourse")
             {
-                Session["Course"] = e.CommandArgument.ToString();
-                Response.Redirect("Course.aspx");
+                Session["CourseID"] = e.CommandArgument.ToString();
+                Response.Redirect("Home.aspx");
             }
         }
 

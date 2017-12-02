@@ -2,15 +2,35 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
     <div class="container">
-        <div>
-            <h2><strong>Student List</strong></h2>
-            <p>To see courses of a student, Please click the student name in the list.</p>
-            <br />
-            <br />
-            <br />
-            <br />
-        </div>
+        <br />
+        <p>
+            <label>Course:&nbsp; </label>
+            <!--AutoPostBack has to be "true" -->
+            <asp:DropDownList ID="courseList" runat="server" AutoPostBack="true" OnSelectedIndexChanged="CourseList_Change">
+            </asp:DropDownList>
+        </p>
+        <asp:Label runat="server" Text="Please select a student to see their courses.&nbsp;" />
         <div class="col-md-8" style="margin-right: auto; margin-left: 25%">
+            <div class="container table-bordered">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h4><strong>
+                            <asp:Label runat="server" ID="courselbl" Text="Course" />
+                        </strong></h4>
+                    </div>
+                    <div class="col-md-4">
+                        <h4><strong>
+                            <asp:Label runat="server" ID="creditlbl" Text="Credit" />
+                        </strong></h4>
+                    </div>
+                    <div class="col-md-4">
+                        <h4><strong>
+                            <asp:Label runat="server" ID="departmentIDlbl" Text="DepartmentID" />
+                        </strong></h4>
+                    </div>
+                </div>
+                <p>To see courses of a student, Please click the student name in the list.</p>
+            </div>
             <!-- Only ItemTemplate can do data binding and < %# Eval("") %>. They don't work in HeaderTemplate and FooterTemplaye -->
             <!-- https://stackoverflow.com/questions/1470472/net-repeater-headertemplate -->
             <table class="table table-striped courseTable align-center">
