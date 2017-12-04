@@ -143,7 +143,7 @@ namespace Comp229_Assign03
             if (e.CommandName == "linkCourse")
             {
                 Session["CourseID"] = e.CommandArgument.ToString();
-                Response.Redirect("Home.aspx");
+                Response.Redirect("Course.aspx");
             }
             else if (e.CommandName == "updateCourse")
             {
@@ -325,7 +325,7 @@ namespace Comp229_Assign03
                 conn.Close();
 
                 // redirect to Home page
-                Response.Redirect("Home.aspx");
+                Response.Redirect("Course.aspx");
             }
         }
         #endregion
