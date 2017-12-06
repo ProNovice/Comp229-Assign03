@@ -106,6 +106,7 @@ namespace Comp229_Assign03
                     SqlDataReader coursesReader = coursesComm.ExecuteReader();
                     studentCoursesRepeater.DataSource = coursesReader;
                     studentCoursesRepeater.DataBind();
+                    coursesReader.Close();
                     conn.Close();
                 }
         }
@@ -175,11 +176,16 @@ namespace Comp229_Assign03
                 deleteStudent.Parameters.AddWithValue("@StudentID", Session["StudentID"]);
 
                 // execute queries
-                conn.Open();
-                deleteEnrollment.ExecuteNonQuery();
-                deleteStudent.ExecuteNonQuery();
-                conn.Close();
-
+                try
+                {
+                    conn.Open();
+                    deleteEnrollment.ExecuteNonQuery();
+                    deleteStudent.ExecuteNonQuery();
+                }
+                finally
+                {
+                    conn.Close();
+                }
                 // redirect to Home page
                 Response.Redirect("Course.aspx");
             }

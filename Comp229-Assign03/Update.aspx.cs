@@ -101,6 +101,7 @@ namespace Comp229_Assign03
                     SqlDataReader coursesReader = coursesComm.ExecuteReader();
                     studentCoursesRepeater.DataSource = coursesReader;
                     studentCoursesRepeater.DataBind();
+                    coursesReader.Close();
                     conn.Close();
                 }
         }
@@ -147,18 +148,21 @@ namespace Comp229_Assign03
             }
             else if (e.CommandName == "deleteCourse")
             {
-                int enrollmentID = Convert.ToInt32(e.CommandArgument.ToString());
-                int studentID = Convert.ToInt32(Session["StudentID"]);  // if the page was loaded well, it means there is a value in Session["StudentID"]
+                using (SqlConnection conn = new SqlConnection(WebConfigurationManager.ConnectionStrings["StudentDB"].ConnectionString))
+                {
+                    int enrollmentID = Convert.ToInt32(e.CommandArgument.ToString());
+                    int studentID = Convert.ToInt32(Session["StudentID"]);  // if the page was loaded well, it means there is a value in Session["StudentID"]
 
-                // delete enrollments first, then delete the student
-                SqlCommand deleteEnrollment = new SqlCommand("DELETE FROM Enrollments WHERE EnrollmentID = @EnrollmentID", conn);
-                deleteEnrollment.Parameters.AddWithValue("EnrollmentID", enrollmentID);
-                // execute query
-                conn.Open();
-                deleteEnrollment.ExecuteNonQuery();
-                conn.Close();
-                // refresh
-                GetStudentCourses();
+                    // delete enrollments first, then delete the student
+                    SqlCommand deleteEnrollment = new SqlCommand("DELETE FROM Enrollments WHERE EnrollmentID = @EnrollmentID", conn);
+                    deleteEnrollment.Parameters.AddWithValue("EnrollmentID", enrollmentID);
+                    // execute query
+                    conn.Open();
+                    deleteEnrollment.ExecuteNonQuery();
+                    conn.Close();
+                    // refresh
+                    GetStudentCourses();
+                }
             }
         }
 
@@ -182,7 +186,6 @@ namespace Comp229_Assign03
                 // close connection
                 conn.Close();
             }
-
         }
 
         protected void AddCourseButton_click(object sender, EventArgs e)
@@ -191,47 +194,51 @@ namespace Comp229_Assign03
             string studentID = Session["StudentID"].ToString();
             int grade = Convert.ToInt32(numNewGrade.Value);
 
-            conn.Open();
-            // check if there is same course in the student's enrollments
-            SqlCommand findSameCourse = new SqlCommand(
-                "SELECT CourseID FROM Enrollments WHERE StudentID = @StudentID AND CourseID = @CourseID", conn);
-            findSameCourse.Parameters.AddWithValue("@CourseID", courseID);
-            findSameCourse.Parameters.AddWithValue("@StudentID", studentID);
-            SqlDataReader sameCourseReader = findSameCourse.ExecuteReader();
-
-            string foundCourse = null;
-            if(sameCourseReader.Read())
-                foundCourse = Convert.ToString(sameCourseReader[0]);
-            sameCourseReader.Close();
-
-            if (foundCourse == null)
+            // add new course
+            using (SqlConnection conn = new SqlConnection(WebConfigurationManager.ConnectionStrings["StudentDB"].ConnectionString))
             {
-                // insert a new enrollment
-                SqlCommand insertEnrollment = new SqlCommand(
-                    "INSERT INTO Enrollments (CourseID, StudentID, Grade) " +
-                    "VALUES (@CourseID, @StudentID, @Grade);", conn);
-                insertEnrollment.Parameters.AddWithValue("@CourseID", courseID);
-                insertEnrollment.Parameters.AddWithValue("@StudentID", studentID);
-                insertEnrollment.Parameters.AddWithValue("@Grade", grade);  // because Grade value cannot be null in Enrollments table 
-                insertEnrollment.ExecuteNonQuery();
+                conn.Open();
+                // check if there is same course in the student's enrollments
+                SqlCommand findSameCourse = new SqlCommand(
+                    "SELECT CourseID FROM Enrollments WHERE StudentID = @StudentID AND CourseID = @CourseID", conn);
+                findSameCourse.Parameters.AddWithValue("@CourseID", courseID);
+                findSameCourse.Parameters.AddWithValue("@StudentID", studentID);
+                SqlDataReader sameCourseReader = findSameCourse.ExecuteReader();
 
-                lblNewCourseError.Visible = false;
+                string foundCourse = null;
+                if (sameCourseReader.Read())
+                    foundCourse = Convert.ToString(sameCourseReader[0]);
+                sameCourseReader.Close();
+
+                if (foundCourse == null)
+                {
+                    // insert a new enrollment
+                    SqlCommand insertEnrollment = new SqlCommand(
+                        "INSERT INTO Enrollments (CourseID, StudentID, Grade) " +
+                        "VALUES (@CourseID, @StudentID, @Grade);", conn);
+                    insertEnrollment.Parameters.AddWithValue("@CourseID", courseID);
+                    insertEnrollment.Parameters.AddWithValue("@StudentID", studentID);
+                    insertEnrollment.Parameters.AddWithValue("@Grade", grade);  // because Grade value cannot be null in Enrollments table 
+                    insertEnrollment.ExecuteNonQuery();
+
+                    lblNewCourseError.Visible = false;
+                }
+                else
+                {
+                    lblNewCourseError.Visible = true;
+                }
+
+                conn.Close();
             }
-            else
-            {
-                lblNewCourseError.Visible = true;
-            }
-
-            conn.Close();
-
             GetStudentCourses();
         }
 
         #endregion
-        
+
         #region Buttons & OnChanged
 
 
+        // prevent not numeric value in the input
         protected void Grade_OnChanged(object sender, EventArgs s)
         {
             RepeaterItem item = (sender as TextBox).Parent as RepeaterItem;
@@ -254,6 +261,7 @@ namespace Comp229_Assign03
 
         // Important function
         // find item in itemTemplate through FindControl
+        // When try to take a value from a textBox, ItemCommand cannot do it. So this methode is used outside of the ItemCommand.
         protected void UpdateGradeButton_click(object sender, EventArgs e)
         {
             string grade;
@@ -272,14 +280,21 @@ namespace Comp229_Assign03
             // prevent Error because of not pure numeric value
             if (isNumeric)
             {
-                // execute queries
-                conn.Open();
-                SqlCommand updateGrade = new SqlCommand(
-                    "UPDATE Enrollments SET Grade = @Grade WHERE EnrollmentID = @EnrollmentID;", conn);
-                updateGrade.Parameters.AddWithValue("@Grade", grade);
-                updateGrade.Parameters.AddWithValue("@EnrollmentID", enrollmentID);
-                updateGrade.ExecuteNonQuery();
-                conn.Close();
+                // always close the connection
+                try
+                {
+                    // execute queries
+                    conn.Open();
+                    SqlCommand updateGrade = new SqlCommand(
+                        "UPDATE Enrollments SET Grade = @Grade WHERE EnrollmentID = @EnrollmentID;", conn);
+                    updateGrade.Parameters.AddWithValue("@Grade", grade);
+                    updateGrade.Parameters.AddWithValue("@EnrollmentID", enrollmentID);
+                    updateGrade.ExecuteNonQuery();
+                }
+                finally
+                {
+                    conn.Close();
+                }
             }
 
         }
@@ -287,6 +302,9 @@ namespace Comp229_Assign03
         // Those actions cannot use ItemCommand in Repeater if th
         protected void UpdateButton_click(object sender, EventArgs e)
         {
+            // it doesn't update studentNumber.
+            // Because it should be unique key, and unchangeable.
+
             // to prevent exception
             if (Session["StudentID"] != null)
             {
@@ -298,9 +316,15 @@ namespace Comp229_Assign03
                 updateStudent.Parameters.AddWithValue("@StudentID", studentID);
 
                 // execute query
-                conn.Open();
-                updateStudent.ExecuteNonQuery();
-                conn.Close();
+                try
+                {
+                    conn.Open();
+                    updateStudent.ExecuteNonQuery();
+                }
+                finally
+                {
+                    conn.Close();
+                }
             }
         }
 
@@ -315,11 +339,16 @@ namespace Comp229_Assign03
                 deleteStudent.Parameters.AddWithValue("@StudentID", Session["StudentID"]);
 
                 // execute queries
-                conn.Open();
-                deleteEnrollment.ExecuteNonQuery();
-                deleteStudent.ExecuteNonQuery();
-                conn.Close();
-
+                try
+                {
+                    conn.Open();
+                    deleteEnrollment.ExecuteNonQuery();
+                    deleteStudent.ExecuteNonQuery();
+                }
+                finally
+                {
+                    conn.Close();
+                }
                 // redirect to Home page
                 Response.Redirect("Course.aspx");
             }

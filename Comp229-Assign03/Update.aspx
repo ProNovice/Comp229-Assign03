@@ -66,6 +66,7 @@
                             <asp:Label ID="lblEnrollmentID" runat="server" Text='<%# Eval("EnrollmentID") %>' Visible="false"></asp:Label>
                         </td>
                         <td>
+                            <!-- to invoke the value of the grade textbox, it have to use just a methode not ItemCommand -->
                             <asp:Button runat="server" OnClick="UpdateGradeButton_click" CssClass="btn" Text="Update" />
                             |                            
                             <asp:Button runat="server" CommandName="deleteCourse" CommandArgument='<%# Eval("EnrollmentID") %>' CssClass="btn" Text="Delete" />

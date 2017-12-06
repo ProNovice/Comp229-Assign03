@@ -42,6 +42,8 @@ namespace Comp229_Assign03
         //p.400 in Textbook
         private void GetCourseList()
         {
+            // alwyas close the connection even Exception occurs.
+            // same as using Try Finally to close connection safely
             using (SqlConnection conn = new SqlConnection(WebConfigurationManager.ConnectionStrings["StudentDB"].ConnectionString))
             {
                 conn.Open();
@@ -54,10 +56,6 @@ namespace Comp229_Assign03
                 courseList.DataTextField = "Title";
                 courseList.DataBind();
 
-                // also put 'All' item to show all students registered
-                ListItem itemForAll = new ListItem("All", "-1");
-                // add the item for 'all'
-                courseList.Items.Add(itemForAll);
                 // close reader
                 reader.Close();
                 // close connection
@@ -65,12 +63,11 @@ namespace Comp229_Assign03
             }
 
             // to make selected course item chosen in the list
-            // if there is no value in session CourseID or the value is -1
-            if (Session["CourseID"] == null || Convert.ToInt32(Session["CourseID"]) == -1)
+            // if there is no value in session CourseID
+            if (Session["CourseID"] == null)
             {
-                Session["CourseID"] = -1;
+                Session["CourseID"] = courseList.SelectedValue;
                 Session["Title"] = courseList.SelectedItem.Text;
-                courseList.SelectedIndex = courseList.Items.Count - 1;
             }
             // if there is any value in session CourseID
             else
@@ -113,7 +110,7 @@ namespace Comp229_Assign03
             string credits = "";
             string departmentID = "";
 
-            // prevent exception of 'All'
+            // prevent exception
             if (Convert.ToInt32(courseID) > 4000)
                 using (SqlConnection conn = new SqlConnection(WebConfigurationManager.ConnectionStrings["StudentDB"].ConnectionString))
                 {
@@ -177,6 +174,7 @@ namespace Comp229_Assign03
                 studentsRepeater.DataSource = studentsReader;
                 // databind
                 studentsRepeater.DataBind();
+                studentsReader.Close();
                 conn.Close();
             }
         }
@@ -187,23 +185,27 @@ namespace Comp229_Assign03
         {
             if (e.CommandName == "deleteStudent")
             {
-                // Delete an enrollment
-                SqlCommand deleteEnrollments = new SqlCommand("DELETE FROM Enrollments WHERE StudentID=@StudentID", connection);
+                try
+                {
+                    // Delete an enrollment
+                    SqlCommand deleteEnrollments = new SqlCommand("DELETE FROM Enrollments WHERE StudentID=@StudentID", connection);
 
-                // parameterize values in SqlCommands
-                deleteEnrollments.Parameters.AddWithValue("@StudentID", e.CommandArgument);
+                    // parameterize values in SqlCommands
+                    deleteEnrollments.Parameters.AddWithValue("@StudentID", e.CommandArgument);
 
-                connection.Open(); // open the connection
+                    connection.Open(); // open the connection
 
-                // delete enrollments first, then delete the student to prevent a order conflict
-                deleteEnrollments.ExecuteNonQuery();
-
-                connection.Close(); // close the connection
+                    // delete enrollments first, then delete the student to prevent a order conflict
+                    deleteEnrollments.ExecuteNonQuery();
+                }
+                finally
+                {
+                    connection.Close(); // close the connection
+                }
 
                 // Rebind changed students database
                 // Here is the Home page, so Redirect to Home.aspx was not added
                 GetStudents();
-
             }
             // redirect to Student page
             else if (e.CommandName == "linkStudent")
