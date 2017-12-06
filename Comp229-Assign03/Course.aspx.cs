@@ -187,18 +187,16 @@ namespace Comp229_Assign03
         {
             if (e.CommandName == "deleteStudent")
             {
+                // Delete an enrollment
                 SqlCommand deleteEnrollments = new SqlCommand("DELETE FROM Enrollments WHERE StudentID=@StudentID", connection);
-                SqlCommand deleteStudent = new SqlCommand("DELETE FROM Students WHERE StudentID=@StudentID", connection);
 
                 // parameterize values in SqlCommands
                 deleteEnrollments.Parameters.AddWithValue("@StudentID", e.CommandArgument);
-                deleteStudent.Parameters.AddWithValue("@StudentID", e.CommandArgument);
 
                 connection.Open(); // open the connection
 
                 // delete enrollments first, then delete the student to prevent a order conflict
                 deleteEnrollments.ExecuteNonQuery();
-                deleteStudent.ExecuteNonQuery();
 
                 connection.Close(); // close the connection
 

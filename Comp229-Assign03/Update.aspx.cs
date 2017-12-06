@@ -145,9 +145,6 @@ namespace Comp229_Assign03
                 Session["CourseID"] = e.CommandArgument.ToString();
                 Response.Redirect("Course.aspx");
             }
-            else if (e.CommandName == "updateCourse")
-            {
-            }
             else if (e.CommandName == "deleteCourse")
             {
                 int enrollmentID = Convert.ToInt32(e.CommandArgument.ToString());
@@ -283,7 +280,6 @@ namespace Comp229_Assign03
                 updateGrade.Parameters.AddWithValue("@EnrollmentID", enrollmentID);
                 updateGrade.ExecuteNonQuery();
                 conn.Close();
-                lblStudentName.Text = grade + enrollmentID;
             }
 
         }
