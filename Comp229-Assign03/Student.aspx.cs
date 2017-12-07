@@ -23,6 +23,9 @@ namespace Comp229_Assign03
 
 
         // Creating a connection from server string
+        // In this assignment, it is using two methodes for the connection
+        // 1. Add connectionString in Web.config
+        // 2. declare SqlConnection in cs file directly
         private SqlConnection conn = new SqlConnection("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=Comp229Assign03;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
 
         protected void Page_Load(object sender, EventArgs e)
